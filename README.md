@@ -1,7 +1,7 @@
 # AppLembrete
 AppLembretes
 
-## Tecnologias usadas
+### Tecnologias usadas
 * Android Studio
 * Kotlin
 * Realm Database
