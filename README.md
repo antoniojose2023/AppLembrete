@@ -1,5 +1,5 @@
 # AppLembrete
-AppLembretes
+
 
 ### Tecnologias usadas
 * Android Studio
