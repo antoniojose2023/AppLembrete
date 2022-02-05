@@ -79,8 +79,6 @@ class MainActivity : AppCompatActivity() {
             adapterLembretes.listaLembretes = list
         }
 
-
-
     }
 
 }
