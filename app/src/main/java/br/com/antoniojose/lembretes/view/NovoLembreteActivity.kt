@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import br.com.antoniojose.lembretes.controller.Controller
 import br.com.antoniojose.lembretes.dataSource.DataSource
 import br.com.antoniojose.lembretes.databinding.ActivityNovoLembreteBinding
 import br.com.antoniojose.lembretes.extensions.format
@@ -18,12 +20,15 @@ import java.util.*
 class NovoLembreteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNovoLembreteBinding
     private var validade = false
+    private lateinit var controller : Controller
+    private lateinit var lembrete: Lembrete
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNovoLembreteBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        controller = Controller(this)
         setDataInterface()
         listeners()
 
@@ -80,34 +85,38 @@ class NovoLembreteActivity : AppCompatActivity() {
                     titulo = binding.editTitulo.text.toString(),
                     descricao = binding.editDescricao.text.toString(),
                     data = binding.editData.text.toString(),
-                    hora = binding.editHora.text.toString(),
-                    id = UUID.randomUUID().toString()
+                    hora = binding.editHora.text.toString()
+
                 )
 
-                DataSource.setLembrete(lembrete)
-                closeActivityLembrete()
+                if(controller.save(lembrete)){
+                    showMessage("Dados salvo com sucesso.")
+                    closeActivityLembrete()
+                }else{
+                    showMessage("Erro ao tentar salvo os dados.")
+                }
+
 
             }else{
 
-                val id = intent.getStringExtra(EXTRA_LEMBRETES)
-                var list = DataSource.getLista()
+                lembrete.also {
+                    it.titulo = binding.editTitulo.text.toString()
+                    it.descricao = binding.editDescricao.text.toString()
+                    it.data = binding.editData.text.toString()
+                    it.hora = binding.editHora.text.toString()
 
-                list.find {
-                     if(it.id == id){
-                             it.titulo = binding.editTitulo.text.toString()
-                             it.descricao = binding.editDescricao.text.toString()
-                             it.data = binding.editData.text.toString()
-                             it.hora = binding.editHora.text.toString()
+                }
 
-                         DataSource.setUpdateLembrete(it)
-                         closeActivityLembrete()
-                     }
-                    true
+                if(controller.update(lembrete)){
+                    showMessage("Dados atualizados com sucesso.")
+                    closeActivityLembrete()
+                }else{
+                    showMessage("Erro ao tentar atualizar os dados.")
+                }
+
                 }
 
             }
-
-        }
 
     }
 
@@ -119,23 +128,16 @@ class NovoLembreteActivity : AppCompatActivity() {
 
 
     fun setDataInterface(){
+        val item = intent.getSerializableExtra(EXTRA_LEMBRETES)
 
-        val id = intent.getStringExtra(EXTRA_LEMBRETES)
+        if(item != null){
+                lembrete = item as Lembrete
+                binding.editTitulo.setText( lembrete.titulo)
+                binding.editDescricao.setText( lembrete.descricao)
+                binding.editData.setText( lembrete.data)
+                binding.editHora.setText( lembrete.hora)
 
-        if(id != null){
-
-            var list = DataSource.getLista()
-            list.find {
-                 if(it.id == id){
-                     binding.editTitulo.setText( it.titulo)
-                     binding.editDescricao.setText( it.descricao)
-                     binding.editData.setText( it.data)
-                     binding.editHora.setText( it.hora)
-                 }
-                true
-            }
-
-            validade = true
+                validade = true
         }
 
     }
@@ -147,5 +149,10 @@ class NovoLembreteActivity : AppCompatActivity() {
 
     }
 
+
+   fun showMessage(mensage: String){
+       Toast.makeText(this, "${mensage}", Toast.LENGTH_LONG).show()
+
+   }
 
 }

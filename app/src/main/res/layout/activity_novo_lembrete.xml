@@ -116,7 +116,7 @@
         android:id="@+id/butto_new"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Criar Lembrets"
+        android:text="Criar Lembretes"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"/>

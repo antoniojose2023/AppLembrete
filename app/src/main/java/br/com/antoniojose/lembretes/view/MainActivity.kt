@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import br.com.antoniojose.lembretes.adapter.AdapterLembretes
+import br.com.antoniojose.lembretes.controller.Controller
 import br.com.antoniojose.lembretes.dataSource.DataSource
 import br.com.antoniojose.lembretes.databinding.ActivityMainBinding
 import br.com.antoniojose.lembretes.model.Lembrete
@@ -17,16 +18,19 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var adapterLembretes = AdapterLembretes()
+    private lateinit var controller: Controller
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        startListeners()
+        controller = Controller(this)
+
         clickButtonCreateNew()
         createRecyclerView()
         updateList()
+        startListeners()
 
 
 
@@ -36,13 +40,16 @@ class MainActivity : AppCompatActivity() {
 
             adapterLembretes.listenerEdit = {
                  var intent = Intent(this, NovoLembreteActivity::class.java)
-                 intent.putExtra(EXTRA_LEMBRETES, it.id)
+                 intent.putExtra(EXTRA_LEMBRETES, it)
                  startActivity(intent)
             }
 
             adapterLembretes.listenerDelete = {
-                 DataSource.delete( it )
+                 controller.delete( it )
                  adapterLembretes.notifyDataSetChanged()
+                 finishActivity(100)
+                 startActivity(intent)
+                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             }
 
     }
@@ -68,7 +75,7 @@ class MainActivity : AppCompatActivity() {
 
     fun updateList(){
 
-        var list = DataSource.getLista()
+        var list = controller.getListLembretes()
         if(list.isEmpty()){
             binding.layoutEmpty.empytLayout.visibility = View.VISIBLE
             binding.rvLembretes.visibility = View.INVISIBLE
